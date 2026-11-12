@@ -1,0 +1,29 @@
+% Sigma-protocol for the preimage of a group homomorphism psi : H -> T (redrawn after Lecture 3, slides "Sigma protocol.
+% Scheme" and "Generalisation of the Sigma-protocol"), with the Fiat-Shamir variant used by poksho.
+% Requires: \usepackage[svgnames]{xcolor}, \usetikzlibrary{arrows.meta,positioning,calc}
+\begin{tikzpicture}[
+    font=\small,
+    party/.style={draw=DarkOrchid, fill=Thistle!60, rounded corners=3pt, minimum width=2.6cm, minimum height=0.75cm,
+                  font=\small\bfseries},
+    msg/.style={-{Stealth[length=2.2mm]}, thick, DarkOrchid},
+    note/.style={font=\footnotesize, align=center}
+  ]
+  \node[party] (P) at (0,0)   {Prover $\mathcal{P}$};
+  \node[party] (V) at (7.4,0) {Verifier $\mathcal{V}$};
+  \node[note, below=1mm of P] {знає $w\in H$ і $\psi(w)=t$};
+  \node[note, below=1mm of V] {знає $(\psi, t)$};
+  % local computations
+  \node[note] at (0,-1.45)   {$r \xleftarrow{\$} H$,\; $a \gets \psi(r)$};
+  \node[note] at (7.4,-2.35) {$c \xleftarrow{\$} \mathcal{C}$};
+  \node[note] at (0,-3.25)   {$z \gets r + c\cdot w$};
+  \node[note] at (7.4,-4.15) {приймається виключно, \\ якщо $\psi(z) = a \cdot t^{\,c}$};
+  % messages
+  \draw[msg] (1.7,-1.45) -- node[above, font=\footnotesize] {зобов'язання $a$} (5.7,-1.45);
+  \draw[msg] (5.7,-2.35) -- node[above, font=\footnotesize] {челендж $c$} (1.7,-2.35);
+  \draw[msg] (1.7,-3.25) -- node[above, font=\footnotesize] {відповідь $z$} (5.7,-3.25);
+  % Fiat-Shamir box
+  \node[draw=Orchid, fill=Lavender, rounded corners=3pt, align=left, font=\footnotesize, anchor=north] at (3.7,-4.75)
+    {\textbf{Fiat--Shamir (як в \texttt{poksho}):}\
+     $c \gets H\bigl(\text{label}\,\|\,\text{statement}\,\|\,\text{public points}\,\|\,a\,\|\,\text{msg}\bigr)$\\[1pt]
+     the proof is $\pi=(c,z)$; $\mathcal{V}$ переобчислює $a=\psi(z)\cdot t^{-c}$ і далі береться геш};
+\end{tikzpicture}

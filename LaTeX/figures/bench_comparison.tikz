@@ -1,0 +1,22 @@
+% Own measurements (criterion, Intel Core i7-1065G7 @ 1.30 GHz, Windows laptop, 2026-11-08):
+% libsignal zkgroup AuthCredentialWithPniZkc vs. BBS (zkryptium 0.8.1, BLS12-381-SHA-256, L = 4, U = 3).
+% Requires: \usepackage{pgfplots}, \pgfplotsset{compat=1.18}, \usepackage[svgnames]{xcolor}
+\begin{tikzpicture}
+  \begin{axis}[
+      ybar, bar width=13pt, width=11cm, height=6.0cm,
+      ymin=0, ymax=15.5, ylabel={Час, ms}, ylabel style={font=\small},
+      symbolic x coords={Issue/Sign, Present/ProofGen, Verify},
+      xtick=data, xticklabel style={font=\small},
+      yticklabel style={font=\footnotesize},
+      enlarge x limits=0.22,
+      legend style={at={(0.5,1.03)}, anchor=south, font=\footnotesize, draw=Plum, legend columns=1},
+      nodes near coords, nodes near coords style={font=\scriptsize, /pgf/number format/.cd, fixed, precision=2},
+      ymajorgrids, grid style={Thistle!70}
+    ]
+    \addplot[draw=DarkOrchid, fill=Orchid!70] coordinates
+      {(Issue/Sign,1.15) (Present/ProofGen,1.85) (Verify,0.95)};
+    \addplot[draw=Plum!80!black, fill=Thistle] coordinates
+      {(Issue/Sign,7.04) (Present/ProofGen,13.05) (Verify,12.42)};
+    \legend{{zkgroup AuthCredential (ristretto255, KVAC)},{BBS, $L=4$, $U=3$ (BLS12-381, pairings)}}
+  \end{axis}
+\end{tikzpicture}

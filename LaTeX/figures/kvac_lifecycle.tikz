@@ -1,0 +1,32 @@
+% Life cycle of a keyed-verification anonymous credential (KVAC): issuance and unlinkable presentation.
+% Requires: \usepackage[svgnames]{xcolor}, \usetikzlibrary{arrows.meta,positioning,calc}
+\begin{tikzpicture}[
+    font=\small,
+    party/.style={draw=DarkOrchid, fill=Thistle!60, rounded corners=3pt, minimum width=3.0cm, minimum height=0.75cm,
+                  font=\small\bfseries, align=center},
+    msg/.style={-{Stealth[length=2.2mm]}, thick, DarkOrchid},
+    lab/.style={above, font=\scriptsize, fill=white, inner sep=1pt},
+    phase/.style={draw=Orchid, fill=Lavender, rounded corners=2pt, font=\scriptsize\bfseries, inner sep=2pt},
+    loc/.style={font=\scriptsize, align=left}
+  ]
+  \node[party] (U) at (0,0)    {User, клієнт};
+  \node[party] (S) at (9.0,0)  {Server\\[-2pt]\scriptsize емітент, веріфаєр};
+  \draw[densely dotted, Plum] (U.south) -- (0,-8.7);
+  \draw[densely dotted, Plum] (S.south) -- (9.0,-8.7);
+  % ---------------- issuance
+  \node[phase] at (4.5,-0.95) {Задача: автентифікація раз в день};
+  \draw[msg] (0.1,-1.75) -- node[lab] {ідентифікатор $\mathrm{UID}$ (звичайний вхід)} (8.9,-1.75);
+  \node[loc, anchor=east] at (8.85,-2.55) {$t\xleftarrow{\$}\mathbb{Z}_q,\ U\xleftarrow{\$}\mathbb{G}$,\\
+         $V = W\,U^{x_0+x_1t}\prod_i M_i^{y_i}$};
+  \draw[msg] (8.9,-3.45) -- node[lab] {$(t,U,V)$ та доказ $\pi_I$ правильності} (0.1,-3.45);
+  \node[loc, anchor=west] at (0.15,-3.95) {перевірка $\pi_I$ за допомогою $(C_W, I)$};
+  % ---------------- presentation
+  \node[phase] at (4.5,-4.7) {Наявність: анонімно, будь-яка кількість разів};
+  \node[loc, anchor=west] at (0.15,-5.5) {$z\xleftarrow{\$}\mathbb{Z}_q$:\ $C_{x_0}=G_{x_0}^zU,\ C_{x_1}=G_{x_1}^zU^t$,\\
+         $C_{y_i}=G_{y_i}^zM_i,\ C_V=G_V^zV$;\ шифротекст $E$};
+  \draw[msg] (0.1,-6.45) -- node[lab] {$\bigl(C_{x_0},C_{x_1},\{C_{y_i}\},C_V,E,\pi\bigr)$} (8.9,-6.45);
+  \node[loc, anchor=east] at (8.85,-7.25) {$Z \gets C_V\big/\bigl(W\,C_{x_0}^{x_0}C_{x_1}^{x_1}\prod_i C_{y_i}^{y_i}\bigr)$,\\
+         прийняти виключно, якщо $\pi$ підтверджено обраним $Z$};
+  \node[loc, anchor=west, DarkOrchid, text width=7.6cm] at (0.15,-8.2)
+       {Оскільки щоразу нове $z$ використовується $\Rightarrow$ презентації не можна пов'язати між собою та з моментом видачі};
+\end{tikzpicture}

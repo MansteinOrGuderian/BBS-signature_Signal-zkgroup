@@ -1,0 +1,33 @@
+% Architecture of the Signal Private Group System (after Chase, Perrin, Zaverucha, CCS 2020).
+% Requires: \usepackage[svgnames]{xcolor}, \usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds}
+\begin{tikzpicture}[
+    font=\small,
+    box/.style={draw=DarkOrchid, fill=Thistle!55, rounded corners=3pt, align=center, minimum height=1.0cm},
+    store/.style={draw=DarkOrchid, fill=white, font=\scriptsize, text width=3.95cm, minimum height=0.42cm,
+                  align=center},
+    flow/.style={-{Stealth[length=2.2mm]}, thick, DarkOrchid},
+    lbl/.style={font=\scriptsize, align=center, fill=white, inner sep=1.5pt}
+  ]
+  % clients
+  \node[box, minimum width=2.9cm, font=\small] (A) at (0,1.6)  {Alice (учасник)\\[-1pt]\scriptsize володіє $\mathit{GroupMasterKey}$};
+  \node[box, minimum width=2.9cm, font=\small] (B) at (0,-1.6) {Bob (учасник)\\[-1pt]\scriptsize володіє $\mathit{GroupMasterKey}$};
+  % server
+  \node[box, minimum width=4.6cm, minimum height=4.6cm, fill=Lavender, anchor=center] (S) at (8.0,0) {};
+  \node[font=\small\bfseries, anchor=north] at (S.north) {Сервер Signal};
+  \node[font=\scriptsize, anchor=north, align=center] at ($(S.north)+(0,-0.45)$)
+       {емітент та пруфер\\ зберігає $\mathit{ServerSecretParams}$};
+  \node[store] (r1) at ($(S.center)+(0,0.05)$)
+       {$\mathsf{Enc}(\mathrm{UID}_A)\;\big|\;\mathsf{Enc}(\mathrm{PK}_A)\;\big|\;\text{role}$};
+  \node[store, below=0pt of r1] (r2)  {$\mathsf{Enc}(\mathrm{UID}_B)\;\big|\;\mathsf{Enc}(\mathrm{PK}_B)\;\big|\;\text{role}$};
+  \node[store, below=0pt of r2] (r3)  {$\mathsf{Enc}(\text{title}),\ \mathsf{Enc}(\text{avatar}),\ \dots$};
+  \node[font=\scriptsize, above=1pt of r1] {Зашифрований стан групи};
+  % flows
+  \draw[flow] ($(A.east)+(0,0.25)$) -- node[lbl, above=2pt, font=\scriptsize] {\textcircled{\tiny 1} daily $\mathit{AuthCredential}$\\[-1pt]
+        (issued to $\mathrm{UID}_A$)} ($(S.west)+(0,1.85)$);
+  \draw[flow] ($(S.west)+(0,1.25)$) -- ($(A.east)+(0,-0.25)$);
+  \draw[flow] ($(A.south east)+(-0.2,0)$) -- node[lbl, pos=0.55]
+        {\textcircled{\tiny 2} $\bigl(\mathsf{Enc}(\mathrm{UID}_A),\ \pi\bigr)$\\[-1pt]
+        anonymous request} ($(S.west)+(0,0.2)$);
+  \draw[flow] ($(S.west)+(0,-0.6)$) -- node[lbl, pos=0.5] {\textcircled{\tiny 3} encrypted entries} ($(B.north east)+(-0.2,0)$);
+  \draw[flow, dashed, Orchid] ($(A.south)+(-0.4,0)$) -- node[lbl, left=1pt] {key shared\\ end-to-end} ($(B.north)+(-0.4,0)$);
+\end{tikzpicture}
