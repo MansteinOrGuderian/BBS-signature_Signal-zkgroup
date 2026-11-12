@@ -318,3 +318,5 @@ TSWLatexianTemp*
 
 # lib
 libsignal/
+Benchmarks/
+bbs-bench/
