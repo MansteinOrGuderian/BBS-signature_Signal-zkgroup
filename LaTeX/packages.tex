@@ -1,0 +1,65 @@
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setsansfont{Tahoma}
+\setmonofont{Roboto Mono}
+\usepackage[fontsize=12pt]{fontsize}
+\usepackage{microtype}
+\usepackage[english, ukrainian]{babel}
+\usepackage[
+    top = 40pt,
+    bottom = 20pt,
+    right = 50pt,
+    left = 50pt,
+    footskip = 15pt,
+    showframe
+]{geometry}
+\usepackage{setspace}
+\setstretch{1.08}
+\usepackage{amsmath,amssymb,amsthm, mathtools}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{graphicx}
+\usepackage[unicode,
+bookmarks = true,
+]{hyperref}
+\hypersetup{
+    colorlinks = true,
+    linkcolor = [RGB]{255, 3, 209},
+    breaklinks = true,
+    filecolor = magenta,
+    citecolor = green,
+    anchorcolor = black,
+    urlcolor = cyan,
+}
+% \usepackage[colorlinks=true, linkcolor=DarkOrchid, citecolor=DarkOrchid, urlcolor=Purple]{hyperref}
+%\usepackage[nameinlink]{cleveref}
+\usepackage[svgnames]{xcolor}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, backgrounds, shapes.symbols, shapes.geometric, fit, calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepackage{booktabs, tabularx, multirow, array}
+
+\usepackage{enumitem}
+\setlist{itemsep=1pt, topsep=3pt}
+\usepackage{titlesec}
+\usepackage{tabularray}
+\usepackage{fancyhdr}
+\usepackage[absolute,overlay]{textpos}
+
+\usepackage{caption}
+\captionsetup{font=small, labelfont=bf}
+
+\usepackage[backend=biber,style=numeric,sorting=none,autolang=other]{biblatex}
+\usepackage{csquotes}
+\usepackage[most]{tcolorbox}
+\newtcolorbox{examplebox}[1][]{colback=Lavender!60, colframe=DarkOrchid, fonttitle=\bfseries, title=#1,
+    boxrule=0.6pt, arc=2pt, left=4pt, right=4pt, top=2pt, bottom=2pt}
+
+
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem*{example}{Example}
+
+
