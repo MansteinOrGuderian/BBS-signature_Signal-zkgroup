@@ -1,0 +1,86 @@
+\documentclass{article}
+\input{packages.tex}
+
+\addbibresource{references.bib}
+
+\begin{document}
+\input{title.tex}
+
+\newcommand{\G}{\mathbb{G}}
+\newcommand{\Zq}{\mathbb{Z}_q}
+\newcommand{\sample}{\xleftarrow{\$}}
+\newcommand{\PK}{\mathsf{PK}}
+\newcommand{\UID}{\mathrm{UID}}
+
+\makeatletter
+\renewcommand{\tableofcontents}{
+  \clearpage
+  \thispagestyle{empty}
+  \begin{center}
+          \bfseries\Large\MakeUppercase{Зміст}
+  \end{center}
+
+  \addvspace{42pt}
+  \@starttoc{toc}
+}
+\renewcommand{\@pnumwidth}{2em}
+\renewcommand{\@tocrmarg}{3em}
+\makeatother
+
+\tableofcontents
+
+\cleardoublepage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\newpage
+
+% Clear the header and footer
+\fancyhead{}
+\fancyfoot{}
+% Set the right side of the footer to be the page number
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyfoot[C]{
+  \begin{textblock*}{2cm}(20cm,27.3cm) % bottom right corner of A4
+    \small\thepage
+  \end{textblock*}
+}
+\pagestyle{fancy}
+
+
+\section*{Список умовних позначень}
+\phantomsection
+\addcontentsline{toc}{section}{Список скорочень}
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.05}
+\noindent
+\begin{tabularx}{\linewidth}{@{}l X l X@{}}
+  \toprule
+  ACI / PNI & Signal account identifier / phone-number identifier & KVAC              & Keyed-Verification Anonymous Credential        \\
+  BBS       & Boneh-Boyen-Shacham signatures                      & MAC               & Message Authentication Code                    \\
+  BLS12-381 & pairing-friendly elliptic curve used by BBS         & NIZK              & Non-Interactive Zero-Knowledge (proof)         \\
+  CCA / CPA & chosen-ciphertext / chosen-plaintext attack         & PGS               & (Signal) Private Group System                  \\
+  CFRG      & Crypto Forum Research Group of the IRTF             & PK                & profile key (Signal)                           \\
+  CL        & Camenisch-Lysyanskaya credentials                   & PQ                & post-quantum                                   \\
+  CMZ       & Chase-Meiklejohn-Zaverucha MACs                     & $q$-SDH           & $q$-Strong Diffie-Hellman assumption           \\
+  CPZ       & Chase-Perrin-Zaverucha scheme                       & ROM               & Random Oracle Model                            \\
+  DDH / DL  & Decisional Diffie-Hellman / Discrete Logarithm      & SHO               & Stateful Hash Object (\texttt{poksho})         \\
+  FS        & Fiat-Shamir transformation                          & SNARK             & Succinct Non-interactive ARgument of Knowledge \\
+  GGM       & Generic Group Model                                 & UID               & user identifier (16-byte UUID)                 \\
+  HNDL      & Harvest-Now-Decrypt-Later                           & ZK, ZKPoK         & zero knowledge, ZK proof of knowledge          \\
+  HVZK      & Honest-Verifier Zero Knowledge                      & $\Sigma$-protocol & three-move public-coin proof                   \\
+  \bottomrule
+\end{tabularx}
+\endgroup
+\clearpage
+
+\input{sourcereport.tex}
+
+\renewcommand*{\mkbibacro}[1]{#1}
+\DeclareFieldFormat{url}{\href{#1}{\mkbibacro{(URL)}}}
+\newpage
+\selectlanguage{english}
+\printbibliography[heading=bibintoc, title={Список літературних джерел}]
+
+\end{document}
