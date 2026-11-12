@@ -317,6 +317,9 @@ TSWLatexianTemp*
 *_en.pdf
 
 # lib
-libsignal/
+#libsignal/rust/zkgroup/examples/sizes.rs
+#libsignal/
 Benchmarks/
 bbs-bench/
+
+libsignal/
