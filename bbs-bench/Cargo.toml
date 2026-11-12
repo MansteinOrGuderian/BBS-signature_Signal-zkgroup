@@ -1,0 +1,15 @@
+[package]
+name = "bbs-bench"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+zkryptium = { version = "=0.8.1", default-features = false, features = ["bbsplus"] }
+rand = "0.8"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bench]]
+name = "bbs"
+harness = false
