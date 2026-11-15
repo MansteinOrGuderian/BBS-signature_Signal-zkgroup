@@ -1,0 +1,25 @@
+\begin{tikzpicture}[
+    font=\normalsize,
+    node distance=3mm and 4mm,
+    root/.style={draw=DarkOrchid, fill=Thistle, rounded corners=3pt, font=\normalsize\bfseries, align=center},
+    fam/.style={draw=DarkOrchid, fill=Thistle!45, rounded corners=3pt, align=center, text width=4.6cm},
+    leaf/.style={draw=Plum, fill=white, rounded corners=2pt, align=left, font=\small, text width=4.6cm},
+    hl/.style={leaf, draw=DarkOrchid, very thick, fill=Lavender},
+    edge/.style={DarkOrchid, thick}
+  ]
+  \node[root] (R) {Анонімні облікові дані (anonymous credentials)\\[-1pt]\small\mdseries Chaum, 1985};
+  \node[fam, below left=6mm and -1.9cm of R]  (PV) {\textbf{Публічно верифіковані}\\[-1pt]
+        \small (publicly verifiable): \\ облікові дані $=$ \emph{підпис}};
+  \node[fam, below right=6mm and -1.9cm of R] (KV) {\textbf{З верифікацією за ключем}\\[-1pt]
+        \small (KVAC): облікові \\ дані $=$ \emph{алгебраїчний MAC}};
+  \node[leaf, below=of PV] (pv1) {Підписи CL (strong RSA, 2001)};
+  \node[hl,   below=1.2mm of pv1] (pv2) {BBS / BBS+ (спарювання, $q$-SDH);\\ чернетка IETF CFRG, BLS12-381};
+  \node[leaf, below=1.2mm of pv2] (pv3) {PS, U-Prove, \dots};
+  \node[leaf, below=of KV] (kv1) {CMZ: $\mathsf{MAC}_{\mathsf{GGM}}$, $\mathsf{MAC}_{\mathsf{DDH}}$ (2014)};
+  \node[hl,   below=1.2mm of kv1] (kv2) {Chase--Perrin--Zaverucha (2020)\\ $\rightarrow$ Signal \texttt{zkgroup}};
+  \node[leaf, below=1.2mm of kv2] (kv3) {BBS-MAC (2016), $\mu$CMZ / $\mu$BBS (2024),\\ Tor Lox, IETF ARC};
+  \draw[edge] (R) -- (PV); \draw[edge] (R) -- (KV);
+  \draw[edge] (PV) -- (pv1); \draw[edge] (KV) -- (kv1);
+  \node[font=\small, align=center, below=3mm of $(pv3.south)!0.5!(kv3.south)$]
+       {спільний «двигун»: $\Sigma$-протоколи $+$ Фіат--Шамір};
+\end{tikzpicture}

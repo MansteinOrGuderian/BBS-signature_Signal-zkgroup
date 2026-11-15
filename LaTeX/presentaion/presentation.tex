@@ -1,0 +1,473 @@
+\newif\ifnotesonly
+\notesonlyfalse % \notesonlytrue
+
+\documentclass[aspectratio=169, 10pt, xcolor=svgnames]{beamer}
+
+\ifnotesonly
+  \setbeameroption{show only notes}
+\fi
+
+% Orchid-Thistle Thema
+\useoutertheme[subsection=false]{miniframes}
+\useinnertheme{rounded}
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{PlumDark}{HTML}{4A2050}
+\setbeamercolor{normal text}{fg=PlumDark, bg=white}
+\setbeamercolor{structure}{fg=DarkOrchid}
+\setbeamercolor{alerted text}{fg=MediumVioletRed}
+\setbeamercolor{section in head/foot}{fg=PlumDark, bg=Thistle}
+\setbeamercolor{frametitle}{fg=PlumDark, bg=Lavender}
+\setbeamercolor{title}{fg=PlumDark, bg=Thistle}
+\setbeamercolor{subtitle}{fg=DarkOrchid}
+\setbeamercolor{block title}{fg=white, bg=Orchid}
+\setbeamercolor{block body}{fg=PlumDark, bg=Lavender}
+\setbeamercolor{block title alerted}{fg=white, bg=MediumOrchid}
+\setbeamercolor{block body alerted}{fg=PlumDark, bg=Thistle!40}
+\setbeamercolor{block title example}{fg=white, bg=Plum!90!black}
+\setbeamercolor{block body example}{fg=PlumDark, bg=Thistle!25}
+\setbeamercolor{footnote}{fg=DarkOrchid}
+\setbeamercolor{footnote mark}{fg=DarkOrchid}
+\setbeamercolor{page number in head/foot}{fg=DarkOrchid}
+\setbeamercolor{bibliography entry author}{fg=PlumDark}
+\setbeamercolor{bibliography entry note}{fg=DarkOrchid}
+\setbeamerfont{footnote}{size=\tiny}
+\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth, ht=2.6ex, dp=1.2ex, leftskip=0.8em]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle
+  \end{beamercolorbox}}
+% page numbers from the second slide (title slide — [plain])
+\setbeamertemplate{footline}{%
+  \hfill\usebeamercolor[fg]{page number in head/foot}\usebeamerfont{footnote}%
+  \insertframenumber\,/\,\inserttotalframenumber\hspace{1.2em}\vspace{1.0ex}}
+\setbeamertemplate{bibliography item}[text]
+% notes page: a thumbnail of the slide at the top, with the narrative text below
+\setbeamerfont{note page}{size=\small}
+\setbeamertemplate{note page}{%
+  \vspace*{0.4em}%
+  \fbox{\insertslideintonotes{0.30}}\hspace{1em}%
+  \parbox[b]{0.55\paperwidth}{\usebeamercolor[fg]{structure}\bfseries\insertframetitle\par
+    \normalfont\color{PlumDark}\footnotesize слайд \insertframenumber}\par
+  \vspace{0.6em}%
+  \parbox{\textwidth}{\usebeamerfont{note page}\insertnote}}
+
+% Packages
+\usepackage{fontspec}
+% \setmainfont{Times New Roman}
+% \setsansfont{Tahoma}
+% \setmonofont{Roboto Mono}
+\IfFontExistsTF{CMU Sans Serif}{\setsansfont{CMU Sans Serif}}{%
+  \IfFontExistsTF{DejaVu Sans}{\setsansfont{DejaVu Sans}}{\setsansfont{Arial}}}
+\IfFontExistsTF{Roboto Mono}{\setmonofont{Roboto Mono}}{}
+\usepackage[english]{babel}
+\babelprovide[import, main]{ukrainian}
+\usepackage{csquotes}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, calc, fit, backgrounds, shapes.geometric}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[backend=biber,style=numeric,sorting=none,autolang=other]{biblatex}
+
+\addbibresource{../references.bib}
+
+\newcommand{\G}{\mathbb{G}}
+\newcommand{\Zq}{\mathbb{Z}_q}
+\newcommand{\UID}{\mathrm{UID}}
+\newcommand{\photo}[2][height=0.32\textheight]{\IfFileExists{screenshots/#2}{\includegraphics[#1]{screenshots/#2}}{}}
+
+\title{Довести все, не розкривши нічого:}
+\subtitle{Як BBS-підписи та Signal zkgroup ламають правила стеження}
+\author{Юрчук Олексій}
+\institute{ФІ-52мн}
+\date{13.11.2026}
+
+\begin{document}
+
+%  1 slide
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+%  2. План
+
+\begin{frame}{План доповіді}
+  \begin{columns}[c]
+    \begin{column}{0.55\textwidth}
+      \begin{enumerate}
+        \item \textbf{Вступ:} Дві родини анонімних облікових даних
+        \item \textbf{Проєкт:} Приватні групи Signal -- що і навіщо доводиться
+        \item \textbf{Протокол:} Алгебраїчний MAC $+$ $\Sigma$-протоколи
+        \item \textbf{Аналіз:} Припущення, ризики, бенчмарки, альтернатива BBS
+        \item \textbf{Висновки} і питання для самоперевірки
+      \end{enumerate}
+      \textbf{Чому ця тема:} Актуально; відсилка до лекції~3; Відкрита програмна реалізація.
+    \end{column}
+    \begin{column}{0.40\textwidth}
+      \begin{block}{Головне питання}
+        Як довести серверу, що я \emph{учасник групи}, не кажучи, \emph{хто я}?
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%  3. Вступ: дві родини
+\section{Вступ}
+\begin{frame}{Анонімні облікові дані: дві родини}
+  \begin{columns}[T]
+    \begin{column}{0.58\textwidth}
+      \centering
+      \resizebox{\linewidth}{!}{\input{figures/slides_taxonomy.tikz}}
+    \end{column}
+    \begin{column}{0.41\textwidth}
+      \small
+      \textbf{Ідея}\footnotemark[1]: "Посвідчення"{} від видавця (issuer); показуємо лише потрібне, пред'явлення
+      не зв'язуються.\par\smallskip
+      \textbf{Аналогія:} Паспорт перевіряє будь-хто; жетон гардероба -- лише той гардероб, що його видав
+      (за ключем\footnotemark[2]).\par\smallskip
+      \centering\photo[width=\linewidth, height=0.42\textheight, keepaspectratio]{analogy_passport_token.jpg}
+    \end{column}
+  \end{columns}
+  \footnotetext[1]{Chaum, CACM 1985 \cite{Chaum85}}
+  \footnotetext[2]{Chase, Meiklejohn, Zaverucha, CCS 2014 \cite{CMZ14}}
+\end{frame}
+
+%  4. Проєкт: задача
+\section{Проєкт}
+\begin{frame}{Задача: приватні групи (private groups)}
+  \begin{columns}[T]
+    \begin{column}{0.68\textwidth}
+      \begin{columns}[T]
+        \begin{column}{0.49\linewidth}
+          \begin{block}{До редизайну}
+            \footnotesize
+            \begin{itemize}
+              \item Групи існують лише на телефонах -- сервер про неї не знає\footnotemark[1]
+              \item Немає канонічного стану
+              \item Немає ролей (адмін / учасник)
+            \end{itemize}
+          \end{block}
+        \end{column}
+        \begin{column}{0.49\linewidth}
+          \begin{block}{Private Group System}
+            \footnotesize
+            \begin{itemize}
+              \item Стан групи на сервері, але \textbf{зашифрований}\footnotemark[2]
+              \item сервер перевіряє, що запит від учасника, але не знає, від якого саме
+            \end{itemize}
+          \end{block}
+        \end{column}
+      \end{columns}
+      \medskip
+      \begin{alertblock}{Наївне рішення}
+        \footnotesize Список на сервері відкрито $\Rightarrow$ сервер бачить соціальний граф (social graph).
+        $\Rightarrow$ Потрібне доведення з нульовим розголошенням.
+      \end{alertblock}
+    \end{column}
+    \begin{column}{0.30\textwidth}
+      \centering\photo[width=\linewidth, height=0.74\textheight, keepaspectratio]{signal_group_info.png}
+    \end{column}
+  \end{columns}
+  \footnotetext[1]{Signal Blog, 2019 \cite{SignalBlog2019}}
+  \footnotetext[2]{Chase, Perrin, Zaverucha, CCS 2020 \cite{CPZ20}}
+\end{frame}
+
+%  5. Проєкт: архітектура і ролі
+
+\begin{frame}{Архітектура і ролі: хто що доводить}
+  \begin{columns}[c]
+    \begin{column}{0.60\textwidth}
+      \centering
+      \resizebox{\linewidth}{!}{\input{figures/slides_architecture.tikz}}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \small
+      \begin{tabular}{@{}p{0.34\linewidth}p{0.62\linewidth}@{}}
+        \toprule
+        Доказувач (prover)       & клієнт учасника \\
+        Верифікатор (verifier)   & сервер Signal \\
+        Видавець (issuer)        & \textbf{той самий} сервер $\Rightarrow$ KVAC\footnotemark[1] \\
+        Приховано                & UID, ключ профілю, зв'язок між запитами \\
+        Розкрито                 & день $\tau$, шифротекст $E$ \\
+        \bottomrule
+      \end{tabular}\par\medskip
+      \begin{block}{Твердження (statement)}
+        \footnotesize "Маю дійсне посвідчення на \emph{якийсь} UID, і $E$ зашифровано \emph{саме цим} UID 
+        ключем \emph{цієї} групи"{}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \footnotetext[1]{Chase, Perrin, Zaverucha, CCS 2020~\cite{CPZ20}}
+\end{frame}
+
+%  6. Протокол: Σ-протокол
+
+\section{Протокол}
+\begin{frame}{Один двигун для всіх доведень: $\Sigma$-протокол}
+  \begin{columns}[T]
+    \begin{column}{0.56\textwidth}
+      \centering
+      \resizebox{\linewidth}{!}{\input{figures/slides_sigma.tikz}}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{Прообраз гомоморфізму}
+        Довести знання\footnotemark[1] $w$ такого, що $\psi(w)=t$
+      \end{block}
+      \begin{itemize}\small
+        \item повнота, спец.\ обґрунтованість, HVZK
+        \item AND-композиція: спільний виклик
+        \item Фіат--Шамір\footnotemark[2]: $c = H(\dots)$
+      \end{itemize}
+      \begin{alertblock}{У \texttt{zkgroup}}
+        \small кожне доведення таке: без схем (circuits) і довіреного налаштування (trusted setup)
+      \end{alertblock}
+    \end{column}
+  \end{columns}
+  \footnotetext[1]{Лекція 3, "$\Sigma$-протоколи"{}~\cite{SigmaProtocols}}
+  \footnotetext[2]{Fiat, Shamir, CRYPTO 1986~\cite{FS86}}
+\end{frame}
+
+%  7. Протокол: алгебраїчний MAC
+
+\begin{frame}{Алгебраїчний MAC (algebraic MAC)}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{block}{CMZ, 2014\footnotemark[1]: $\mathsf{MAC}_{\mathsf{GGM}}$}
+        ключ $(x_0,x_1)$; \ тег на $m\in\Zq$: \ $\sigma = (U,\ U^{x_0+x_1 m})$
+      \end{block}
+      \begin{block}{Signal (CPZ, 2020)\footnotemark[2]: атрибути це \emph{елементи групи}}
+        $V = W \cdot U^{x_0+x_1 t}\cdot \prod_i M_i^{\,y_i}$
+      \end{block}
+      \begin{alertblock}{Навіщо}
+        \small Дешеве верифіковане шифрування (verifiable encryption):\\ \textbf{64 байти} замість $>600$
+      \end{alertblock}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{exampleblock}{Іграшковий приклад: $q=11$ у $\mathbb{Z}_{23}^{\times}$, $g=2$}
+        \small
+        ключ $(3,5)$, \ $m=2$: \ $x_0+x_1m = 13 \equiv 2$\\[2pt]
+        тег: $(U,U') = (4,\ 4^2) = (4,16)$\\[4pt]
+        перерандомізація (re-randomisation), $a=4$:\\
+        $(4^4,\ 16^4) = (3,\ 9)$, \quad $3^2 = 9$ \checkmark\\[4pt]
+        \textbf{новий тег на те саме $m$} -- видавець не пов'яже його з $(4,16)$
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+  \footnotetext[1]{Chase, Meiklejohn, Zaverucha, CCS 2014~\cite{CMZ14}}
+  \footnotetext[2]{Chase, Perrin, Zaverucha, CCS 2020~\cite{CPZ20}}
+\end{frame}
+
+%  8. Протокол: видача і пред'явлення
+
+\begin{frame}{Видача і пред'явлення (issue \& present)}
+  \begin{columns}[T]
+    \begin{column}{0.54\textwidth}
+      \centering
+      \resizebox{\linewidth}{!}{\input{figures/slides_lifecycle.tikz}}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{block}{Ключова рівність}
+        \centering $Z = I^{z}$ \quad $\Longleftrightarrow$ \quad MAC дійсний
+      \end{block}
+      \small Доведення\footnotemark[1] $\pi_A$ -- одна AND-композиція:\par\smallskip
+      \footnotesize
+      \begin{tabular}{@{}ll@{}}
+        $Z = I^{z}$                                   & дійсне посвідчення \\
+        $C_{x_1} = C_{x_0}^{\,t}G_{x_0}^{z_0}G_{x_1}^{z}$ & узгоджене $t$ \\
+        $A = G_{a_1}^{a_1}G_{a_2}^{a_2}$              & ключ \emph{цієї} групи \\
+        $E_1 = C_{y_1}^{\,a_1}G_{y_1}^{z_1}$          & $E_1 = M_1^{a_1}$ \\
+        $C_{y_2}/E_2 = G_{y_2}^{z}/E_1^{\,a_2}$        & $E_2 = E_1^{a_2}M_2$ \\
+      \end{tabular}\par\smallskip
+      \small усі рівняння \textbf{лінійні} в секретних показниках
+    \end{column}
+  \end{columns}
+  \footnotetext[1]{Chase, Perrin, Zaverucha, CCS 2020, §5~\cite{CPZ20}}
+\end{frame}
+
+%  9. Протокол: реалізація
+
+\begin{frame}{Реалізація: бібліотека \texttt{poksho}}
+  \begin{columns}[T]
+    \begin{column}{0.40\textwidth}
+      \begin{itemize}\footnotesize
+        \item \textbf{Сильний Фіат--Шамір} (strong FS): гешується опис твердження $+$ усі точки\footnotemark[1]
+        \item \textbf{Синтетичні нонси} (synthetic nonces): $r$ з випадковості \emph{і} гешу секрету
+        \item \textbf{Fault attacks}; доведення $(c,\vec z)$: $32(1+k)$ Б
+        \item \textbf{ristretto255}\footnotemark[2]: простий порядок, без кофактора
+      \end{itemize}
+      \begin{alertblock}{Слабкий FS ламав системи}
+        \footnotesize $c = H(a)$ $\Rightarrow$ твердження підбирають \emph{після} виклику: Helios 2012\footnotemark[3],
+        Frozen Heart 2022\footnotemark[4]
+      \end{alertblock}
+    \end{column}
+    \begin{column}{0.58\textwidth}
+      \centering\photo[width=\linewidth, height=0.80\textheight, keepaspectratio]{poksho_absorb.png}
+    \end{column}
+  \end{columns}
+  \footnotetext[1]{libsignal, \texttt{poksho/src/statement.rs} \cite{libsignal}}
+  \footnotetext[2]{RFC 9496 \cite{RFC9496}}
+  \footnotetext[3]{Bernhard, Pereira, Warinschi, ASIACRYPT 2012 \cite{BPW12}}
+  \footnotetext[4]{Trail of Bits, 2022 \cite{FrozenHeart22}}
+\end{frame}
+
+%  10. Аналіз: припущення і ризики
+
+\section{Аналіз}
+\begin{frame}{Припущення і ризики}
+  \begin{columns}[T]
+    \begin{column}{0.32\textwidth}
+      \begin{block}{Припущення\footnotemark[1]}
+        \small
+        \begin{itemize}
+          \item DDH у $\G$
+          \item MAC$_\mathsf{GGM}$: доведено лише в моделі загальної групи (GGM)
+          \item Модель випадкового оракула (ROM)
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \begin{block}{Властивості}
+        \small
+        \begin{itemize}
+          \item Ключ сервера $=$ право "друкувати"{} посвідчення
+          \item Детерміноване шифрування: сервер бачить рівність записів
+          \item Cкладна not black-box композиція
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \begin{alertblock}{Квантова загроза}
+        \small
+        \begin{itemize}
+          \item Усе на стійкості дискретного логарифму $\Rightarrow$ алгоритм Шора
+          \item HNDL: "harvest now -- decrypt later"{}
+        \end{itemize}
+      \end{alertblock}
+    \end{column}
+  \end{columns}
+  \vfill
+  \centering\small Публічних звітів про вразливості саме в \texttt{zkgroup} в інтернеті немає, але це не гарантія 
+  безпеки!
+  \footnotetext[1]{Chase, Perrin, Zaverucha, CCS 2020~\cite{CPZ20}}
+\end{frame}
+
+%  11. Аналіз: продуктивність
+
+\begin{frame}{Продуктивність: власні виміри}
+  \begin{columns}[T]
+    \begin{column}{0.60\textwidth}
+      \scriptsize\setlength{\tabcolsep}{3.5pt}
+      \begin{tabular}{@{}lrrr@{}}
+        \toprule
+        Об'єкт                   & \shortstack[r]{байти                      \\2020\footnotemark[1] $\to$ 2026} & \shortstack[r]{створення,\\мс}
+                                 & \shortstack[r]{перевірка,                 \\мс} \\
+        \midrule
+        UidCiphertext            & 64 $\to$ 65               & 0.085 & 0.158 \\
+        AuthCredential: response & 361 $\to$ 425             & 1.15  & 0.51  \\
+        AuthCredential: present  & 493 $\to$ 633             & 1.85  & 0.95  \\
+        ProfileKeyCred.: present & 713 $\to$ 721             & 1.97  & 1.12  \\
+        \bottomrule
+      \end{tabular}\par\smallskip
+      Intel Core i7-1065G7, Windows; \texttt{cargo bench} (criterion)\footnotemark[2]\par\smallskip
+      \centering\photo[width=\linewidth, height=0.42\textheight, keepaspectratio]{cargo_bench_terminal.png}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \begin{block}{Чому байтів більше, ніж у статті?}
+        \footnotesize
+        \begin{itemize}
+          \item \textbf{+1 байт}: версія формату
+          \item \textbf{493 $\to$ 633}: Посвідчення засвідчує \emph{два} ідентифікатори (ACI $+$ PNI)
+          \item Розміри не залежать від процесора
+        \end{itemize}
+      \end{block}
+      \begin{alertblock}{Підсумок}
+        \footnotesize усе $\approx$ 1--2 мс, $<1$ КБ; група зі 100 учасників $\approx$ 0.07 с
+      \end{alertblock}
+    \end{column}
+  \end{columns}
+  \footnotetext[1]{Chase, Perrin, Zaverucha, CCS 2020, Table 1 \cite{CPZ20}}
+  \footnotetext[2]{libsignal, коміт 8509425 \cite{libsignal}}
+\end{frame}
+
+%  12. Аналіз: альтернатива BBS
+
+\begin{frame}{Чи можна замінити на BBS?}
+  \begin{columns}[T]
+    \begin{column}{0.54\textwidth}
+      \centering
+      \resizebox{\linewidth}{!}{\input{figures/slides_bench.tikz}}\par
+      \scriptsize та сама машина; BBS -- \texttt{zkryptium}\footnotemark[1]; показано \emph{порядок}, не точне
+      співвідношення
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \small
+      \textbf{BBS}\footnotemark[2]: підпис 80 Б, доведення $272 + 32U$ Б, $U$ -- undisclosed messages, стандарт 
+      IETF у розробці\par\medskip
+      \textbf{Ціна заміни:}
+      \begin{enumerate}
+        \item Спарювання (pairings): на порядок повільніше (перевірено реалізацією)
+        \item Потреба другої кривої (BLS12-381)
+        \item \alert{Повідомлення BBS -- скаляри} $\Rightarrow$ ламається дешеве шифрування точок
+      \end{enumerate}
+      \textbf{Виграш:} Публічна верифікація -- Signal не потрібна\par\medskip
+      Як компроміс: BBS-MAC / $\mu$BBS\footnotemark[3] -- без спарювань
+    \end{column}
+  \end{columns}
+  \footnotetext[1]{zkryptium 0.8.1~\cite{zkryptium}}
+  \footnotetext[2]{IRTF CFRG, draft-irtf-cfrg-bbs-signatures-12~\cite{BBSdraft}}
+  \footnotetext[3]{Orr{\`u}, ePrint 2024/1552 (CCS 2025)~\cite{Orru24}}
+\end{frame}
+
+%  13. Висновки
+
+\section{Висновки}
+\begin{frame}{Висновки}
+  \begin{enumerate}
+    \item Модель довіри визначає криптографію: видавець $=$ верифікатор $\Rightarrow$ \textbf{KVAC}, а не підписи
+    \item Внесок Signal: MAC на \textbf{елементах групи} $\Rightarrow$ дешеве верифіковане шифрування
+    \item Виміри: $\approx$ 1-2 мс, $<1$ КБ на операцію
+    \item Слабкі місця: GGM, складність композиції, \alert{відсутність постквантової стійкості}
+    \item BBS тут -- крок назад; реальна еволюція -- нові KVAC або постквантовий редизайн
+  \end{enumerate}
+  \note{
+    Підсумую доповідь п'ятьма тезами. Перше: криптографію визначає модель довіри -- оскільки сервер і видає, 
+    і перевіряє, Signal обрав верифікацію за ключем. Друге: головний винахід -- MAC, у якого атрибути є точками 
+    групи; це зробило шифрування учасників компактним. Третє: це швидко -- мілісекунди і сотні байтів. 
+    Четверте: слабкі місця -- теоретична модель загальної групи, складність і, головне, квантова загроза. 
+    І п'яте: стандартний BBS тут не допоможе; майбутнє за новими схемами з верифікацією за ключем або 
+    постквантова перебудова всієї системи.}
+\end{frame}
+
+% 14. Питання для самоперевірки
+
+\begin{frame}{Питання для самоперевірки}
+  \small
+  \begin{enumerate}
+    \item Чому Signal не потрібна публічна верифікованість?\\
+          \rotatebox[origin=c]{180}{{\color{DarkOrchid}(Видавець і верифікатор -- той самий сервер, тож досить KVAC на алгебраїчному MAC.)}}
+    \item Що означає рівність $Z = I^z$ при пред'явленні?\\
+          \rotatebox[origin=c]{180}{{\color{DarkOrchid}(Клієнт має дійсний MAC сервера на приховані атрибути; доводиться як Шнорр.)}}
+    \item Чому атрибути-точки кращі за атрибути-скаляри?\\
+          \rotatebox[origin=c]{180}{{\color{DarkOrchid}(Дають дешеве верифіковане шифрування UID: 64 байти замість $>600$.)}}
+    \item Чим небезпечний слабкий Фіат--Шамір $c = H(a)$?\\
+          \rotatebox[origin=c]{180}{{\color{DarkOrchid}(Твердження можна підібрати після виклику $\Rightarrow$ "доведення"{} хибних тверджень.)}}
+    \item Що буде, якщо доказувач двічі використає той самий нонс $r$?\\
+          \rotatebox[origin=c]{180}{{\color{DarkOrchid}(Спеціальна обґрунтованість дає секрет: $x = (z - z')/(c - c')$.)}}
+    \item Чому \texttt{zkgroup} вразливий у постквантову епоху?\\
+          \rotatebox[origin=c]{180}{{\color{DarkOrchid}(Усе на дискретному логарифмі; загроза HNDL для збережених шифротекстів груп.)}}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Джерела}
+  \renewcommand*{\bibfont}{\tiny}
+  \renewcommand*{\mkbibacro}[1]{#1}
+  \DeclareFieldFormat{url}{\href{#1}{\mkbibacro{(URL)}}}
+  \printbibliography[heading=none]
+\end{frame}
+
+\end{document}

@@ -1,0 +1,19 @@
+\begin{tikzpicture}
+  \begin{axis}[
+      ybar, bar width=13pt, width=9.5cm, height=5.6cm,
+      ymin=0, ymax=15.5, ylabel={час, мс}, ylabel style={font=\small},
+      symbolic x coords={Видача/підпис, Створення доведення, Перевірка},
+      xtick=data, xticklabel style={font=\small, align=center, text width=2.4cm},
+      yticklabel style={font=\footnotesize},
+      enlarge x limits=0.22,
+      legend style={at={(0.5,1.03)}, anchor=south, font=\footnotesize, draw=Plum, legend columns=1},
+      nodes near coords, nodes near coords style={font=\scriptsize, /pgf/number format/.cd, fixed, precision=2},
+      ymajorgrids, grid style={Thistle!70}
+    ]
+    \addplot[draw=DarkOrchid, fill=Orchid!70] coordinates
+      {(Видача/підпис,1.15) (Створення доведення,1.85) (Перевірка,0.95)};
+    \addplot[draw=Plum!80!black, fill=Thistle] coordinates
+      {(Видача/підпис,7.04) (Створення доведення,13.05) (Перевірка,12.42)};
+    \legend{{zkgroup AuthCredential (ristretto255, KVAC)},{BBS, $L=4$, $U=3$ (BLS12-381, спарювання)}}
+  \end{axis}
+\end{tikzpicture}

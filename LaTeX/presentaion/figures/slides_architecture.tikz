@@ -1,0 +1,31 @@
+\begin{tikzpicture}[
+    font=\normalsize,
+    box/.style={draw=DarkOrchid, fill=Thistle!55, rounded corners=3pt, align=center, minimum height=1.0cm},
+    store/.style={draw=DarkOrchid, fill=white, font=\footnotesize, text width=4.2cm, minimum height=0.42cm,
+                  align=center},
+    flow/.style={-{Stealth[length=2.2mm]}, thick, DarkOrchid},
+    lbl/.style={font=\footnotesize, align=center, fill=white, inner sep=1.5pt}
+  ]
+  \node[box, minimum width=3.1cm] (A) at (0,1.6)  {Аліса (учасниця)\\[-1pt]\footnotesize має $\mathit{GroupMasterKey}$};
+  \node[box, minimum width=3.1cm] (B) at (0,-1.6) {Боб (учасник)\\[-1pt]\footnotesize має $\mathit{GroupMasterKey}$};
+  \node[box, minimum width=4.8cm, minimum height=4.6cm, fill=Lavender] (S) at (8.2,0) {};
+  \node[font=\normalsize\bfseries, anchor=north] at (S.north) {Сервер Signal};
+  \node[font=\footnotesize, anchor=north, align=center] at ($(S.north)+(0,-0.45)$)
+       {видавець \emph{і} верифікатор\\ має $\mathit{ServerSecretParams}$};
+  \node[store] (r1) at ($(S.center)+(0,0.05)$)
+       {$\mathsf{Enc}(\mathrm{UID}_A)\;\big|\;\mathsf{Enc}(\mathrm{PK}_A)\;\big|\;$роль};
+  \node[store, below=0pt of r1] (r2) {$\mathsf{Enc}(\mathrm{UID}_B)\;\big|\;\mathsf{Enc}(\mathrm{PK}_B)\;\big|\;$роль};
+  \node[store, below=0pt of r2] (r3) {$\mathsf{Enc}$(назва), $\mathsf{Enc}$(аватар), \dots};
+  \node[font=\footnotesize, above=1pt of r1] {зашифрований стан групи};
+  \draw[flow] ($(A.east)+(0,0.25)$) -- node[lbl, above=2pt]
+        {\textcircled{\scriptsize 1} щоденний $\mathit{AuthCredential}$\\[-1pt]
+        (видано для $\mathrm{UID}_A$)} ($(S.west)+(0,1.85)$);
+  \draw[flow] ($(S.west)+(0,1.25)$) -- ($(A.east)+(0,-0.25)$);
+  \draw[flow] ($(A.south east)+(-0.2,0)$) -- node[lbl, pos=0.55]
+        {\textcircled{\scriptsize 2} $\bigl(\mathsf{Enc}(\mathrm{UID}_A),\ \pi\bigr)$\\[-1pt] анонімний запит}
+        ($(S.west)+(0,0.2)$);
+  \draw[flow] ($(S.west)+(0,-0.6)$) -- node[lbl, pos=0.5] {\textcircled{\scriptsize 3} зашифровані записи}
+        ($(B.north east)+(-0.2,0)$);
+  \draw[flow, dashed, Orchid] ($(A.south)+(-0.5,0)$) -- node[lbl, left=1pt] {ключ передано\\ наскрізно (E2E)}
+        ($(B.north)+(-0.5,0)$);
+\end{tikzpicture}

@@ -1,0 +1,23 @@
+\begin{tikzpicture}[
+    font=\normalsize,
+    party/.style={draw=DarkOrchid, fill=Thistle!60, rounded corners=3pt, minimum width=3.0cm, minimum height=0.75cm,
+                  font=\normalsize\bfseries, align=center},
+    msg/.style={-{Stealth[length=2.2mm]}, thick, DarkOrchid},
+    note/.style={font=\small, align=center}
+  ]
+  \node[party] (P) at (0,0)   {Доказувач $\mathcal{P}$\\[-2pt]\footnotesize\mdseries(prover)};
+  \node[party] (V) at (7.4,0) {Верифікатор $\mathcal{V}$\\[-2pt]\footnotesize\mdseries(verifier)};
+  \node[note, below=1mm of P] {знає $w\in H$: $\psi(w)=t$};
+  \node[note, below=1mm of V] {знає $(\psi, t)$};
+  \node[note] at (0,-1.55)   {$r \xleftarrow{\$} H$,\; $a \gets \psi(r)$};
+  \node[note] at (7.4,-2.45) {$c \xleftarrow{\$} \mathcal{C}$};
+  \node[note] at (0,-3.35)   {$z \gets r + c\cdot w$};
+  \node[note] at (7.4,-4.25) {прийняти, якщо $\psi(z) = a \cdot t^{\,c}$};
+  \draw[msg] (1.7,-1.55) -- node[above, font=\small] {зобов'язання $a$ (commitment)} (5.7,-1.55);
+  \draw[msg] (5.7,-2.45) -- node[above, font=\small] {виклик $c$ (challenge)} (1.7,-2.45);
+  \draw[msg] (1.7,-3.35) -- node[above, font=\small] {відповідь $z$ (response)} (5.7,-3.35);
+  \node[draw=Orchid, fill=Lavender, rounded corners=3pt, align=left, font=\small, anchor=north] at (3.7,-4.8)
+    {\textbf{Фіат--Шамір (як у \texttt{poksho}):}
+     $c \gets H\bigl(\text{мітка}\,\|\,\text{твердження}\,\|\,\text{точки}\,\|\,a\,\|\,\text{повідомлення}\bigr)$\\[1pt]
+     доведення $\pi=(c,z)$; $\mathcal{V}$ відновлює $a=\psi(z)\cdot t^{-c}$ і хешує};
+\end{tikzpicture}
