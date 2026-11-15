@@ -313,7 +313,7 @@ TSWLatexianTemp*
 #*Notes.bib
 
 # LaTeX
-!*.tex
+*_notes.*
 *_en.pdf
 
 # lib
